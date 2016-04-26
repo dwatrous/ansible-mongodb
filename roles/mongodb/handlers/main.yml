@@ -1,0 +1,5 @@
+---
+# Handler for DB notifications
+
+- name: restart mongod
+  service: name=mongod state=restarted

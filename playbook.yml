@@ -1,0 +1,8 @@
+---
+- name: deploy MongoDB and configure the database
+  hosts: 
+    - mongodb
+  user: vagrant
+  sudo: yes
+  roles:
+    - mongodb

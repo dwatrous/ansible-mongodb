@@ -1,0 +1,66 @@
+---
+# swiped from https://github.com/ssilab/ansible-mongodb
+- name: 'Install dependencies'
+  tags: 'mongodb'
+  sudo: 'yes'
+  apt: >
+    pkg={{ item }}
+    update_cache=yes
+  with_items:
+    - 'python-pycurl' # Required by Ansible for adding apt repositories
+
+# currently using validate_certs=no due to problem with wildcard certificates in Python 2.7.6 on Ubuntu 14.04
+- name: 'Add MongoDB apt key'
+  tags: 'mongodb'
+  sudo: 'yes'
+  apt_key: >
+    url=https://docs.mongodb.org/10gen-gpg-key.asc
+    state=present
+    validate_certs=no
+
+- name: 'Add MongoDB apt repository'
+  tags: 'mongodb'
+  sudo: 'yes'
+  apt_repository: >
+    repo='deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen'
+    state=present
+
+- name: 'Install MongoDB'
+  tags: 'mongodb'
+  sudo: 'yes'
+  apt: >
+    pkg=mongodb-org
+    state=present
+    update_cache=true
+
+- name: 'Ensure backup script directory exists'
+  tags: 'mongodb'
+  sudo: 'yes'
+  file: >
+    path={{ mongodb_backup_script_dir }}
+    state=directory
+    owner=root
+    group=backup
+  when:
+    - mongodb_backup_frequency != 'never'
+
+- name: 'Install backup script'
+  tags: 'mongodb'
+  sudo: 'yes'
+  template: >
+    src=mongo_dump.sh
+    dest={{ mongodb_backup_script_dir }}/{{ mongodb_backup_script_filename }}
+    owner=root
+    group=backup
+  when:
+    - mongodb_backup_frequency != 'never'
+
+- name: 'Set up cron job for automated backups'
+  tags: 'mongodb'
+  sudo: 'yes'
+  cron: >
+    name="{{ mongodb_backup_cron_name }}"
+    special_time={{ mongodb_backup_frequency }}
+    job="sh {{ mongodb_backup_script_dir }}/{{ mongodb_backup_script_filename }}"
+  when:
+    - mongodb_backup_frequency != 'never'
