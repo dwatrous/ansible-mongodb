@@ -4,8 +4,17 @@ This demonstrates the installation of MongoDB using Ansible
 Quick start:
 * clone this repository
 * run '''vagrant up'''
-* ssh into the newly created server
-  * run '''ansible-playbook -i src/stage src/playbook.yml''' (also found in bootstrap.sh)
+* ssh into the newly created server (`vagrant ssh`)
+
+Using mongo:
+
+```
+mongo
+use somedb
+db.somecollection.insert({"name": "Daniel Watrous"})
+db.somecollection.insert({"message": "Hello World"})
+db.somecollection.find()
+```
 
 Some things to consider.
 * This assumes Ubuntu 14.04
