@@ -1,8 +1,26 @@
 ---
+- name: bootstrap host with ansible deps.
+  remote_user: root
+  hosts:
+    - mongodb
+  gather_facts: no
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+
 - name: deploy MongoDB and configure the database
-  hosts: 
+  hosts:
     - mongodb
   user: vagrant
   sudo: yes
+  pre_tasks:
+    - name: Install core packages
+      become: yes
+      package: name={{item}} state=installed
+      ignore_errors: True
+      with_items:
+        - git
+        - python-dev
+        - python-pip
   roles:
-    - mongodb
+      - mongodb

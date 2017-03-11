@@ -1,2 +1,5 @@
 ---
+galaxy_info:
+  author: Daniel Watrous
+  description: This demonstrates the installation of MongoDB using Ansible.
 dependencies: []
